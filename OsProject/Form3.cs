@@ -37,7 +37,11 @@ namespace OsProject
 
         private void Form3_Load(object sender, EventArgs e)
         {
-
+            label6.Hide();
+            label4.Hide();
+            label5.Hide();
+            textBox3.Hide();
+            textBox4.Hide();
             if (flagc == 1)
             {
                 label1.Text = "FCFS";
@@ -53,14 +57,23 @@ namespace OsProject
             else if (flagc == 4)
             {
                 label1.Text = "Priority-P";
+                label4.Show();
+                textBox3.Show();
             }
             else if (flagc == 5)
             {
                 label1.Text = "Priority-NP";
+                label4.Show();
+                textBox3.Show();
             }
             else if (flagc == 6)
             {
                 label1.Text = "RR";
+                
+                label5.Show();
+                label5.Location = new Point(label4.Location.X, label4.Location.Y );
+                textBox4.Location = new Point(textBox4.Location.X , label4.Location.Y);
+                textBox4.Show();
             }
 
 
@@ -263,6 +276,16 @@ namespace OsProject
         }
 
         private void CalculatePNP()
+        {
+
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
         {
 
         }
