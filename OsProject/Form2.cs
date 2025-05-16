@@ -12,6 +12,7 @@ namespace OsProject
 {
     public partial class Form2: Form
     {
+        public int flag = 0;
         public Form2()
         {
             InitializeComponent();
@@ -75,37 +76,43 @@ namespace OsProject
         {
             if (listBox1.SelectedItem == "FCFS")
             {
-               Form3 form3 = new Form3();
+                flag = 1;
+               Form3 form3 = new Form3(flag);
                 this.Hide();
                 form3.Show();
             }
             else if (listBox1.SelectedItem == "SJFP")
             {
-                Form3 form3 = new Form3();
+                flag = 2;
+                Form3 form3 = new Form3(flag);
                 this.Hide();
                 form3.Show();
             }
             else if (listBox1.SelectedItem == "SJFNP")
             {
-                Form3 form3 = new Form3();
+                flag = 3;
+                Form3 form3 = new Form3(flag);
                 this.Hide();
                 form3.Show();
             }
             else if (listBox1.SelectedItem == "PriorityP")
             {
-                Form3 form3 = new Form3();
+                flag = 4;
+                Form3 form3 = new Form3(flag);
                 this.Hide();
                 form3.Show();
             }
             else if (listBox1.SelectedItem == "PriorityNP")
             {
-                Form3 form3 = new Form3();
+                flag = 5;
+                Form3 form3 = new Form3(flag);
                 this.Hide();
                 form3.Show();
             }
             else if (listBox1.SelectedItem == "RR")
             {
-                Form3 form3 = new Form3();
+                flag = 6;
+                Form3 form3 = new Form3(flag);
                 this.Hide();
                 form3.Show();
             }

@@ -22,15 +22,44 @@ namespace OsProject
             public int WT;
         }
         List<prcss> process = new List<prcss>();
-
-        public Form3()
+        int flagc;
+        public Form3(int flag)
         {
+            flagc = flag;
             InitializeComponent();
             
         }
+        
 
         private void Form3_Load(object sender, EventArgs e)
         {
+
+            if (flagc == 1)
+            {
+                label1.Text = "FCFS";
+            }
+            else if (flagc == 2)
+            {
+                label1.Text = "SJF-P";
+            }
+            else if (flagc == 3)
+            {
+                label1.Text = "SJF-NP";
+            }
+            else if (flagc == 4)
+            {
+                label1.Text = "Priority-P";
+            }
+            else if (flagc == 5)
+            {
+                label1.Text = "Priority-NP";
+            }
+            else if (flagc == 6)
+            {
+                label1.Text = "RR";
+            }
+
+
             this.BackColor = Color.Gray;
             dataGridView1.Columns.Add("pid", "Process ID");
             dataGridView1.Columns.Add("arrival", "Arrival Time");
@@ -63,6 +92,34 @@ namespace OsProject
             textBox1.Clear();
             textBox2.Clear();
 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (flagc == 1)
+            {
+               
+            }
+            else if (flagc == 2)
+            {
+                
+            }
+            else if (flagc == 3)
+            {
+                
+            }
+            else if (flagc == 4)
+            {
+               
+            }
+            else if (flagc == 5)
+            {
+                
+            }
+            else if (flagc == 6)
+            {
+                
+            }
         }
     }
 }
