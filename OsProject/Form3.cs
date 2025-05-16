@@ -238,6 +238,13 @@ namespace OsProject
             {
 
             }
+            if(process.Count>0)
+            {
+                    int avgWT = process.Sum(x => x.WT) / process.Count;
+                    int avgTAT = process.Sum(x => x.TAT) / process.Count;
+                    label6.Text ="Average waiting time is : " + avgWT.ToString() + "\n" + "Average turn around time is : " + avgTAT.ToString();
+                    label6.Show();
+            }
         }
         private void CalculateFCFS()
         {
