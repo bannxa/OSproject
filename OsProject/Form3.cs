@@ -16,6 +16,7 @@ namespace OsProject
         {
             public int ID;
             public int arrival;
+            public int priority;
             public int burst;
             public int CT;
             public int TAT;
@@ -81,6 +82,7 @@ namespace OsProject
             dataGridView1.Columns.Add("pid", "Process ID");
             dataGridView1.Columns.Add("arrival", "Arrival Time");
             dataGridView1.Columns.Add("burst", "Burst Time");
+            dataGridView1.Columns.Add("Pr", "Priority");
             dataGridView1.Columns.Add("completion", "C.T.");
             dataGridView1.Columns.Add("wait", "Waiting Time");
             dataGridView1.Columns.Add("TAT", "T.A. Time");
@@ -99,15 +101,33 @@ namespace OsProject
 
         private void button1_Click(object sender, EventArgs e)
         {
-            prcss pnn = new prcss();
-            pnn.ID = process.Count + 1;
-            pnn.arrival = Convert.ToInt32(textBox1.Text);
-            pnn.burst = Convert.ToInt32(textBox2.Text);
-            process.Add(pnn);
-            int i = process.Count - 1;
-            dataGridView1.Rows.Add(process[i].ID, process[i].arrival, process[i].burst, "", "", "");
-            textBox1.Clear();
-            textBox2.Clear();
+            if(textBox1.Text!=""|| textBox2.Text != "")
+            {
+                prcss pnn = new prcss();
+                pnn.ID = process.Count + 1;
+                pnn.arrival = Convert.ToInt32(textBox1.Text);
+                pnn.burst = Convert.ToInt32(textBox2.Text);
+                if(flagc == 4 || flagc == 5)
+                {
+                    pnn.priority = Convert.ToInt32(textBox3.Text);
+                }
+                process.Add(pnn);
+                int i = process.Count - 1;
+                if(flagc == 4 || flagc == 5)
+                {
+                    dataGridView1.Rows.Add(process[i].ID, process[i].arrival, process[i].burst, process[i].priority, "", "", "");
+                    textBox3.Clear();
+                }
+                else
+                    dataGridView1.Rows.Add(process[i].ID, process[i].arrival, process[i].burst, "", "", "");
+                textBox1.Clear();
+                textBox2.Clear();
+            }
+            else
+            {
+                MessageBox.Show("Please fill in the textbox");
+            }
+            
 
         }
         void calcSJFNP()
@@ -144,6 +164,40 @@ namespace OsProject
             done.Add(imin);
             Time = 999;
             min = 999;
+        }
+        private void CalculateP_NP()
+        {
+            int imin = -1;
+            for (int i = 0; i < process.Count; i++)
+            {
+                if (done.Contains(i))
+                    continue;
+                if (process[i].priority < min && process[i].arrival <= Time)
+                {
+                    min = process[i].priority;
+                    imin = i;
+                    Time = process[i].arrival;
+                }
+            }
+
+          
+            tot += process[imin].burst;
+            process[imin].CT = tot;
+            process[imin].TAT = process[imin].CT - process[imin].arrival;
+            process[imin].WT = process[imin].TAT - process[imin].burst;
+            if (process[imin].TAT < 0)
+            {
+                process[imin].TAT = 0;
+            }
+            if (process[imin].WT < 0)
+            {
+                process[imin].WT = 0;
+            }
+            done.Add(imin);
+            min = 999;
+            Time = 999;
+
+
         }
         void calcSJFP()
         {
@@ -232,7 +286,17 @@ namespace OsProject
             }
             else if (flagc == 5)
             {
-
+                for (int i = 0; i < process.Count; i++)
+                {
+                    CalculateP_NP();
+                }
+                
+                for (int i = 0; i < process.Count; i++)
+                {
+                    dataGridView1.Rows[i].Cells["wait"].Value = process[i].WT;
+                    dataGridView1.Rows[i].Cells["completion"].Value = process[i].CT;
+                    dataGridView1.Rows[i].Cells["TAT"].Value = process[i].TAT;
+                }
             }
             else if (flagc == 6)
             {
@@ -282,10 +346,6 @@ namespace OsProject
 
         }
 
-        private void CalculatePNP()
-        {
-
-        }
 
         private void label4_Click(object sender, EventArgs e)
         {
