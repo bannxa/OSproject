@@ -27,7 +27,7 @@ namespace OsProject
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
             this.Load += Form1_Load;
-            MessageBox.Show("no");
+            MessageBox.Show("yes");
         }
 
 
