@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace OsProject
 {
-    public partial class Form3: Form
+    public partial class Form3 : Form
     {
         class prcss
         {
@@ -27,9 +27,9 @@ namespace OsProject
         {
             flagc = flag;
             InitializeComponent();
-            
+
         }
-        
+
 
         private void Form3_Load(object sender, EventArgs e)
         {
@@ -77,7 +77,7 @@ namespace OsProject
 
         private void label1_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -98,28 +98,69 @@ namespace OsProject
         {
             if (flagc == 1)
             {
-               
+                CalculateFCFS();
             }
             else if (flagc == 2)
             {
-                
+
             }
             else if (flagc == 3)
             {
-                
+
             }
             else if (flagc == 4)
             {
-               
+
             }
             else if (flagc == 5)
             {
-                
+
             }
             else if (flagc == 6)
             {
-                
+
             }
         }
+        private void CalculateFCFS()
+        {
+            int n = process.Count;
+            process[0].CT = process[0].arrival + process[0].burst;
+            process[0].TAT = process[0].CT - process[0].arrival;
+            process[0].WT = process[0].TAT - process[0].burst;
+
+            for (int i = 1; i < n; i++)
+            {
+                if (process[i].arrival > process[i - 1].CT)
+                {
+                    process[i].CT = process[i].arrival + process[i].burst;
+                }
+                else
+                {
+                    process[i].CT = process[i - 1].CT + process[i].burst;
+                }
+                process[i].TAT = process[i].CT - process[i].arrival;
+                process[i].WT = process[i].TAT - process[i].burst;
+            }
+            dataGridView1.Rows.Clear();
+            for (int i = 0; i < process.Count; i++)
+            {
+                dataGridView1.Rows.Add
+                (
+                    process[i].ID,
+                    process[i].arrival,
+                    process[i].burst,
+                    process[i].CT,
+                    process[i].WT,
+                    process[i].TAT
+                );
+            }
+
+        }
+
+        private void CalculatePNP()
+        {
+
+        }
     }
+
 }
