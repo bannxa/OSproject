@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ProgressBar;
 
 namespace OsProject
 {
@@ -21,6 +22,8 @@ namespace OsProject
             public int CT;
             public int TAT;
             public int WT;
+            public int QT;
+            public int Rem_Time;
         }
          List<prcss> process = new List<prcss>();
          List<int> done = new List<int>();
@@ -28,14 +31,23 @@ namespace OsProject
          int tot;
          int min = 999;
          int flagc;
+        int check = 0;
         public Form3(int flag)
         {
             flagc = flag;
             InitializeComponent();
-
         }
         private void Form3_Load(object sender, EventArgs e)
         {
+            this.panelGanttChart = new System.Windows.Forms.Panel();
+            this.panelGanttChart.Location = new System.Drawing.Point(this.ClientSize.Width/2 - this.panelGanttChart.Width, this.ClientSize.Height - this.panelGanttChart.Height);
+            this.panelGanttChart.Size = new System.Drawing.Size(610, 60);
+            this.panelGanttChart.BackColor = System.Drawing.Color.White;
+            this.panelGanttChart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Controls.Add(this.panelGanttChart);
+            this.panelGanttChart.Paint += panelGanttChart_Paint;
+
+
             label6.Hide();
             label4.Hide();
             label5.Hide();
@@ -101,9 +113,16 @@ namespace OsProject
                 pnn.ID = process.Count + 1;
                 pnn.arrival = Convert.ToInt32(textBox1.Text);
                 pnn.burst = Convert.ToInt32(textBox2.Text);
-                if(flagc == 4 || flagc == 5)
+               
+                pnn.Rem_Time = pnn.burst;
+                if (flagc == 4 || flagc == 5)
                 {
                     pnn.priority = Convert.ToInt32(textBox3.Text);
+                }
+                if(flagc == 6)
+                {
+                    pnn.QT = Convert.ToInt32(textBox4.Text);
+                    textBox4.Enabled=false;
                 }
                 process.Add(pnn);
                 int i = process.Count - 1;
@@ -262,6 +281,13 @@ namespace OsProject
             }
             else if (flagc == 4)
             {
+                CalcPP();
+                for (int i = 0; i < process.Count; i++)
+                {
+                    dataGridView1.Rows[i].Cells["wait"].Value = process[i].WT;
+                    dataGridView1.Rows[i].Cells["completion"].Value = process[i].CT;
+                    dataGridView1.Rows[i].Cells["TAT"].Value = process[i].TAT;
+                }
 
             }
             else if (flagc == 5)
@@ -280,7 +306,13 @@ namespace OsProject
             }
             else if (flagc == 6)
             {
-
+                calc();
+                for (int i = 0; i < process.Count; i++)
+                {
+                    dataGridView1.Rows[i].Cells["wait"].Value = process[i].WT;
+                    dataGridView1.Rows[i].Cells["completion"].Value = process[i].CT;
+                    dataGridView1.Rows[i].Cells["TAT"].Value = process[i].TAT;
+                }
             }
             if(process.Count>0)
             {
@@ -289,6 +321,8 @@ namespace OsProject
                     label6.Text ="Average waiting time is : " + avgWT.ToString() + "\n" + "Average turn around time is : " + avgTAT.ToString();
                     label6.Show();
             }
+           
+            panelGanttChart.Invalidate();
         }
         private void CalculateFCFS()
         {
@@ -325,10 +359,175 @@ namespace OsProject
             }
 
         }
+        void calc()
+        {
+            textBox3.Clear();
+            int time = 0;
+            while (check < process.Count)
+            {
+                for (int i = 0; i < process.Count ; i++)
+                {
+                    if (process[i].arrival <= time && process[i].Rem_Time > 0 || process[i].Rem_Time > 0)
+                    {
+                        if (process[i].Rem_Time > process[i].QT)
+                        {
+                            process[i].Rem_Time -= process[i].QT;
+                            time += process[i].QT;
+                        }
+                        else
+                        {
+                            time += process[i].Rem_Time;
+                            process[i].Rem_Time = 0;
+                            process[i].CT = time;
+                            process[i].TAT = process[i].CT - process[i].arrival;
+                            process[i].WT = process[i].TAT - process[i].burst;
+                           
+                            dataGridView1.Rows[i].Cells["wait"].Value = process[i].WT;
+                            dataGridView1.Rows[i].Cells["completion"].Value = process[i].CT;
+                            dataGridView1.Rows[i].Cells["TAT"].Value = process[i].TAT;
+                            check++;
+                        }
+                        if (check == process.Count)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         private void label4_Click(object sender, EventArgs e)
         {
 
         }
+        private void panelGanttChart_Paint(object sender, PaintEventArgs e)
+        {
+            if (process.Count == 0) //wont draw if nothing was added to the table
+                return;
+
+            int panelWidth = panelGanttChart.ClientSize.Width; //width & height of the gnnt chart
+            int panelHeight = panelGanttChart.ClientSize.Height;
+
+            int xPadding = 10;  //padding so it doesnt take the whole panel 
+            int topPadding = 10;
+
+            int labelHeight = 18; // height for time labels
+
+            int barHeight = panelHeight - topPadding - labelHeight - 8; //so it fits the panel and 8 is just extra padding
+
+
+            Font font = new Font("Arial", 10); // font & pens
+            Brush barBrush = Brushes.Blue;
+            Brush textBrush = Brushes.White;
+            Pen borderPen = Pens.Black;
+
+
+            int totalBurst = process.Sum(p => p.burst); //used to calc the bar width for all processes 
+            if (totalBurst == 0) return; //to avoid dividing by 0
+
+            int availableWidth = panelWidth - 2 * xPadding;
+            float pixelsPerBurst = (float)availableWidth / totalBurst;
+
+            int xOffset = xPadding;
+            int[] barWidths = new int[process.Count];
+            int accumulatedWidth = 0;
+
+            // Calculate all bar widths except the last
+            for (int i = 0; i < process.Count - 1; i++)
+            {
+                barWidths[i] = (int)Math.Round(process[i].burst * pixelsPerBurst);
+                accumulatedWidth += barWidths[i];
+            }
+            // Last bar takes the remaining width to fill the panel exactly
+            barWidths[process.Count - 1] = availableWidth - accumulatedWidth;
+
+            for (int i = 0; i < process.Count; i++)
+            {
+                int width = barWidths[i];
+
+                // Draw bar
+                e.Graphics.FillRectangle(barBrush, xOffset, topPadding, width, barHeight);
+                e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+
+                // Draw process ID centered
+                string pid = $"P{process[i].ID}";
+                SizeF textSize = e.Graphics.MeasureString(pid, font);
+                float textX = xOffset + (width - textSize.Width) / 2;
+                float textY = topPadding + (barHeight - textSize.Height) / 2;
+                e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+
+                // Draw start time below the bar
+                int startTime;
+                if (i == 0)
+                {
+                    startTime = process[i].arrival;
+                }
+                else
+                {
+                    startTime = Math.Max(process[i].arrival, process[i - 1].CT);
+                }
+                e.Graphics.DrawString(startTime.ToString(), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+
+
+                xOffset += width;
+            }
+
+            string lastCT = process[process.Count - 1].CT.ToString();
+            SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+            e.Graphics.DrawString(lastCT, font, Brushes.Black, xOffset - lastCTSize.Width, topPadding + barHeight + 2);
+
+        }
+
+        void CalcPP()
+        {
+            int n = process.Count;
+            int completed = 0;
+            int currentTime = 0;
+            int[] rem = process.Select(p => p.burst).ToArray();
+            bool[] isDone = new bool[n];
+
+            while (completed != n)
+            {
+                // Find process with highest priority that has arrived
+                int imin = -1, minPriority = int.MaxValue;
+                for (int i = 0; i < n; i++)
+                {
+                    if (!isDone[i] && process[i].arrival <= currentTime && rem[i] > 0 &&
+                        process[i].priority < minPriority)
+                    {
+                        minPriority = process[i].priority;
+                        imin = i;
+                    }
+                }
+
+                if (imin != -1)
+                {
+                    rem[imin]--;
+                    currentTime++;
+
+                    if (rem[imin] == 0)
+                    {
+                        isDone[imin] = true;
+                        completed++;
+                        process[imin].CT = currentTime;
+                        process[imin].TAT = process[imin].CT - process[imin].arrival;
+                        process[imin].WT = Math.Max(process[imin].TAT - process[imin].burst, 0);
+                        done.Add(imin);
+                    }
+                }
+                else
+                {
+                    // Jump to next arrival time instead of incrementing one by one
+                    int nextArrival = process.Where(p => !isDone[p.ID])
+                                             .Select(p => p.arrival)
+                                             .Where(t => t > currentTime)
+                                             .DefaultIfEmpty(currentTime + 1)
+                                             .Min();
+                    currentTime = nextArrival;
+                }
+            }
+        }
+
+
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
 
