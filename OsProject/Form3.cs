@@ -195,7 +195,7 @@ namespace OsProject
             while (completed != n)
             {
                 int imin = -1;
-                int minRem = int.MaxValue;
+                int minRem = 999;
                 for (int i = 0; i < n; i++)
                 {
                     if (!isDone[i] && process[i].arrival <= currentTime && rem[i] < minRem && rem[i] > 0)
