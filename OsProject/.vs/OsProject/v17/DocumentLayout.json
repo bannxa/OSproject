@@ -7,16 +7,16 @@
       "RelativeMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|solutionrelative:form3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|C:\\Users\\omarb\\OSproject\\OsProject\\form3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|solutionrelative:form3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|C:\\Users\\omarb\\OSproject\\OsProject\\form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|solutionrelative:form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|C:\\Users\\omarb\\OSproject\\OsProject\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|C:\\Users\\omarb\\OSproject\\OsProject\\form3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|solutionrelative:form3.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
       "AbsoluteMoniker": "D:0:0:{01129391-6BF7-48F4-A8EA-D37010B8D07F}|OsProject.csproj|C:\\Users\\omarb\\OSproject\\OsProject\\form2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
@@ -34,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Bookmark",
@@ -43,6 +43,18 @@
             {
               "$type": "Bookmark",
               "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
             },
             {
               "$type": "Bookmark",
@@ -58,24 +70,22 @@
               "RelativeToolTip": "Form1.cs",
               "ViewState": "AgIAAAEAAAAAAAAAAAAtwBsAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T11:29:07.482Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-16T11:29:07.482Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Users\\omarb\\OSproject\\OsProject\\Form1.cs",
               "RelativeDocumentMoniker": "Form1.cs",
               "ToolTip": "C:\\Users\\omarb\\OSproject\\OsProject\\Form1.cs [Design]",
               "RelativeToolTip": "Form1.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T11:29:05.421Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-05-16T11:29:05.421Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Form2.cs",
               "DocumentMoniker": "C:\\Users\\omarb\\OSproject\\OsProject\\Form2.cs",
               "RelativeDocumentMoniker": "Form2.cs",
@@ -83,8 +93,7 @@
               "RelativeToolTip": "Form2.cs",
               "ViewState": "AgIAAAEAAAAAAAAAAAAIwCkAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T12:18:34.326Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-16T12:18:34.326Z"
             },
             {
               "$type": "Document",
@@ -95,8 +104,7 @@
               "ToolTip": "C:\\Users\\omarb\\OSproject\\OsProject\\Form2.cs [Design]",
               "RelativeToolTip": "Form2.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T12:18:06.108Z",
-              "EditorCaption": " [Design]"
+              "WhenOpened": "2025-05-16T12:18:06.108Z"
             },
             {
               "$type": "Document",
@@ -106,21 +114,22 @@
               "RelativeDocumentMoniker": "Form3.cs",
               "ToolTip": "C:\\Users\\omarb\\OSproject\\OsProject\\Form3.cs",
               "RelativeToolTip": "Form3.cs",
-              "ViewState": "AgIAANIAAAAAAAAAAAA5wEcBAAALAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAgwBkAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-16T12:47:22.269Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
               "Title": "Form3.cs [Design]",
               "DocumentMoniker": "C:\\Users\\omarb\\OSproject\\OsProject\\Form3.cs",
               "RelativeDocumentMoniker": "Form3.cs",
               "ToolTip": "C:\\Users\\omarb\\OSproject\\OsProject\\Form3.cs [Design]",
               "RelativeToolTip": "Form3.cs [Design]",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T12:28:58.66Z"
+              "WhenOpened": "2025-05-16T12:28:58.66Z",
+              "EditorCaption": " [Design]"
             }
           ]
         }
