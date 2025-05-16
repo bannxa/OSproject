@@ -22,7 +22,7 @@ namespace OsProject
             public int TAT;
             public int WT;
         }
-        List<prcss> process = new List<prcss>();
+         List<prcss> process = new List<prcss>();
          List<int> done = new List<int>();
          int Time = 999;
          int tot;
@@ -34,8 +34,6 @@ namespace OsProject
             InitializeComponent();
 
         }
-
-
         private void Form3_Load(object sender, EventArgs e)
         {
             label6.Hide();
@@ -76,8 +74,6 @@ namespace OsProject
                 textBox4.Location = new Point(textBox4.Location.X , label4.Location.Y);
                 textBox4.Show();
             }
-
-
             this.BackColor = Color.Gray;
             dataGridView1.Columns.Add("pid", "Process ID");
             dataGridView1.Columns.Add("arrival", "Arrival Time");
@@ -93,7 +89,6 @@ namespace OsProject
                 dataGridView1.Rows.Add(process[i].ID, process[i].arrival, process[i].burst, process[i].CT, process[i].WT, process[i].TAT);
             }
         }
-
         private void label1_Click(object sender, EventArgs e)
         {
 
@@ -126,8 +121,6 @@ namespace OsProject
             {
                 MessageBox.Show("Please fill in the textbox");
             }
-            
-
         }
         void calcSJFNP()
         {
@@ -147,7 +140,6 @@ namespace OsProject
             process[imin].CT = tot;
             process[imin].TAT = process[imin].CT - process[imin].arrival;
             process[imin].WT = process[imin].TAT - process[imin].burst;
-
             if (process[imin].TAT < 0)
             {
                 process[imin].TAT = 0;
@@ -174,8 +166,6 @@ namespace OsProject
                     Time = process[i].arrival;
                 }
             }
-
-          
             tot += process[imin].burst;
             process[imin].CT = tot;
             process[imin].TAT = process[imin].CT - process[imin].arrival;
@@ -191,8 +181,6 @@ namespace OsProject
             done.Add(imin);
             min = 999;
             Time = 999;
-
-
         }
         void calcSJFP()
         {
@@ -201,7 +189,6 @@ namespace OsProject
             int currentTime = 0;
             int[] rem = new int[n];
             bool[] isDone = new bool[n];
-
             for (int i = 0; i < n; i++)
                 rem[i] = process[i].burst;
 
@@ -209,7 +196,6 @@ namespace OsProject
             {
                 int imin = -1;
                 int minRem = int.MaxValue;
-
                 for (int i = 0; i < n; i++)
                 {
                     if (!isDone[i] && process[i].arrival <= currentTime && rem[i] < minRem && rem[i] > 0)
@@ -219,7 +205,6 @@ namespace OsProject
                     }
                 }
                 currentTime++;
-
                 if (imin != -1)
                 {
                     rem[imin]--;
@@ -340,17 +325,13 @@ namespace OsProject
             }
 
         }
-
-
         private void label4_Click(object sender, EventArgs e)
         {
 
         }
-
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
 
         }
     }
-
 }
