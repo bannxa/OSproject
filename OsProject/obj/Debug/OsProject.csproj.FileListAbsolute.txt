@@ -18,3 +18,15 @@ C:\Users\omarb\OneDrive\Desktop\banna_msa\Year 2\Sem2\Operating System\OsProject
 C:\Users\omarb\OneDrive\Desktop\banna_msa\Year 2\Sem2\Operating System\OsProject\obj\Debug\OsProject.csproj.CoreCompileInputs.cache
 C:\Users\omarb\OneDrive\Desktop\banna_msa\Year 2\Sem2\Operating System\OsProject\obj\Debug\OsProject.exe
 C:\Users\omarb\OneDrive\Desktop\banna_msa\Year 2\Sem2\Operating System\OsProject\obj\Debug\OsProject.pdb
+C:\Users\omarb\OSproject\OsProject\bin\Debug\OsProject.exe.config
+C:\Users\omarb\OSproject\OsProject\bin\Debug\OsProject.exe
+C:\Users\omarb\OSproject\OsProject\bin\Debug\OsProject.pdb
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.csproj.AssemblyReference.cache
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.Form1.resources
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.Properties.Resources.resources
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.csproj.GenerateResource.cache
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.csproj.CoreCompileInputs.cache
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.exe
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.pdb
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.Form2.resources
+C:\Users\omarb\OSproject\OsProject\obj\Debug\OsProject.Form3.resources
