@@ -96,7 +96,6 @@ namespace OsProject
         {
 
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             prcss pnn = new prcss();
@@ -108,7 +107,6 @@ namespace OsProject
             dataGridView1.Rows.Add(process[i].ID, process[i].arrival, process[i].burst, "", "", "");
             textBox1.Clear();
             textBox2.Clear();
-
         }
         void calcSJFNP()
         {
@@ -132,15 +130,11 @@ namespace OsProject
             if (process[imin].TAT < 0)
             {
                 process[imin].TAT = 0;
-
             }
-
             if (process[imin].WT <= 0)
             {
                 process[imin].WT = 0;
-
             }
-
             done.Add(imin);
             Time = 999;
             min = 999;
@@ -237,6 +231,13 @@ namespace OsProject
             else if (flagc == 6)
             {
 
+            }
+            if(process.Count>0)
+            {
+                int avgWT = process.Sum(x => x.WT) / process.Count;
+                int avgTAT = process.Sum(x => x.TAT) / process.Count;
+                label6.Text ="Average waiting time is : " + avgWT.ToString() + "\n" + "Average turn around time is : " + avgTAT.ToString();
+                label6.Show();
             }
         }
         private void CalculateFCFS()
