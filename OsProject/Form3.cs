@@ -15,23 +15,23 @@ namespace OsProject
     {
         class prcss
         {
-            public int ID;
-            public int arrival;
-            public int priority;
-            public int burst;
-            public int CT;
-            public int TAT;
-            public int WT;
-            public int QT;
-            public int Rem_Time;
+            public float ID;
+            public float arrival;
+            public float priority;
+            public float burst;
+            public float CT;
+            public float TAT;
+            public float WT;
+            public float QT;
+            public float Rem_Time;
         }
          List<prcss> process = new List<prcss>();
-         List<int> done = new List<int>();
-         int Time = 999;
-         int tot;
-         int min = 999;
-         int flagc;
-        int check = 0;
+         List<float> done = new List<float>();
+         float Time = 999;
+         float tot;
+         float min = 999;
+         float flagc;
+         float check = 0;
         public Form3(int flag)
         {
             flagc = flag;
@@ -204,9 +204,9 @@ namespace OsProject
         void calcSJFP()
         {
             int n = process.Count;
-            int completed = 0;
-            int currentTime = 0;
-            int[] rem = new int[n];
+            float completed = 0;
+            float currentTime = 0;
+            float[] rem = new float[n];
             bool[] isDone = new bool[n];
             for (int i = 0; i < n; i++)
                 rem[i] = process[i].burst;
@@ -214,7 +214,7 @@ namespace OsProject
             while (completed != n)
             {
                 int imin = -1;
-                int minRem = 999;
+                float minRem = 999;
                 for (int i = 0; i < n; i++)
                 {
                     if (!isDone[i] && process[i].arrival <= currentTime && rem[i] < minRem && rem[i] > 0)
@@ -306,7 +306,7 @@ namespace OsProject
             }
             else if (flagc == 6)
             {
-                calc();
+                calcRR();
                 for (int i = 0; i < process.Count; i++)
                 {
                     dataGridView1.Rows[i].Cells["wait"].Value = process[i].WT;
@@ -316,8 +316,8 @@ namespace OsProject
             }
             if(process.Count>0)
             {
-                    int avgWT = process.Sum(x => x.WT) / process.Count;
-                    int avgTAT = process.Sum(x => x.TAT) / process.Count;
+                    float avgWT = process.Sum(x => x.WT) / process.Count;
+                    float avgTAT = process.Sum(x => x.TAT) / process.Count;
                     label6.Text ="Average waiting time is : " + avgWT.ToString() + "\n" + "Average turn around time is : " + avgTAT.ToString();
                     label6.Show();
             }
@@ -352,6 +352,7 @@ namespace OsProject
                     process[i].ID,
                     process[i].arrival,
                     process[i].burst,
+                    "",
                     process[i].CT,
                     process[i].WT,
                     process[i].TAT
@@ -359,10 +360,10 @@ namespace OsProject
             }
 
         }
-        void calc()
+        void calcRR()
         {
             textBox3.Clear();
-            int time = 0;
+            float time = 0;
             while (check < process.Count)
             {
                 for (int i = 0; i < process.Count ; i++)
@@ -401,79 +402,82 @@ namespace OsProject
         }
         private void panelGanttChart_Paint(object sender, PaintEventArgs e)
         {
-            if (process.Count == 0) //wont draw if nothing was added to the table
-                return;
-
-            int panelWidth = panelGanttChart.ClientSize.Width; //width & height of the gnnt chart
-            int panelHeight = panelGanttChart.ClientSize.Height;
-
-            int xPadding = 10;  //padding so it doesnt take the whole panel 
-            int topPadding = 10;
-
-            int labelHeight = 18; // height for time labels
-
-            int barHeight = panelHeight - topPadding - labelHeight - 8; //so it fits the panel and 8 is just extra padding
-
-
-            Font font = new Font("Arial", 10); // font & pens
-            Brush barBrush = Brushes.Blue;
-            Brush textBrush = Brushes.White;
-            Pen borderPen = Pens.Black;
-
-
-            int totalBurst = process.Sum(p => p.burst); //used to calc the bar width for all processes 
-            if (totalBurst == 0) return; //to avoid dividing by 0
-
-            int availableWidth = panelWidth - 2 * xPadding;
-            float pixelsPerBurst = (float)availableWidth / totalBurst;
-
-            int xOffset = xPadding;
-            int[] barWidths = new int[process.Count];
-            int accumulatedWidth = 0;
-
-            // Calculate all bar widths except the last
-            for (int i = 0; i < process.Count - 1; i++)
+            if (flagc == 1)
             {
-                barWidths[i] = (int)Math.Round(process[i].burst * pixelsPerBurst);
-                accumulatedWidth += barWidths[i];
-            }
-            // Last bar takes the remaining width to fill the panel exactly
-            barWidths[process.Count - 1] = availableWidth - accumulatedWidth;
+                if (process.Count == 0) //wont draw if nothing was added to the table
+                    return;
 
-            for (int i = 0; i < process.Count; i++)
-            {
-                int width = barWidths[i];
+                int panelWidth = panelGanttChart.ClientSize.Width; //width & height of the gnnt chart
+                int panelHeight = panelGanttChart.ClientSize.Height;
 
-                // Draw bar
-                e.Graphics.FillRectangle(barBrush, xOffset, topPadding, width, barHeight);
-                e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+                int xPadding = 10;  //padding so it doesnt take the whole panel 
+                int topPadding = 10;
 
-                // Draw process ID centered
-                string pid = $"P{process[i].ID}";
-                SizeF textSize = e.Graphics.MeasureString(pid, font);
-                float textX = xOffset + (width - textSize.Width) / 2;
-                float textY = topPadding + (barHeight - textSize.Height) / 2;
-                e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+                int labelHeight = 18; // height for time labels
 
-                // Draw start time below the bar
-                int startTime;
-                if (i == 0)
+                int barHeight = panelHeight - topPadding - labelHeight - 8; //so it fits the panel and 8 is just extra padding
+
+
+                Font font = new Font("Arial", 10); // font & pens
+                Brush barBrush = Brushes.Blue;
+                Brush textBrush = Brushes.White;
+                Pen borderPen = Pens.Black;
+
+
+                float totalBurst = process.Sum(p => p.burst); //used to calc the bar width for all processes 
+                if (totalBurst == 0) return; //to avoid dividing by 0
+
+                int availableWidth = panelWidth - 2 * xPadding;
+                float pixelsPerBurst = (float)availableWidth / totalBurst;
+
+                int xOffset = xPadding;
+                int[] barWidths = new int[process.Count];
+                int accumulatedWidth = 0;
+
+                // Calculate all bar widths except the last
+                for (int i = 0; i < process.Count - 1; i++)
                 {
-                    startTime = process[i].arrival;
+                    barWidths[i] = (int)Math.Round(process[i].burst * pixelsPerBurst);
+                    accumulatedWidth += barWidths[i];
                 }
-                else
+                // Last bar takes the remaining width to fill the panel exactly
+                barWidths[process.Count - 1] = availableWidth - accumulatedWidth;
+
+                for (int i = 0; i < process.Count; i++)
                 {
-                    startTime = Math.Max(process[i].arrival, process[i - 1].CT);
+                    int width = barWidths[i];
+
+                    // Draw bar
+                    e.Graphics.FillRectangle(barBrush, xOffset, topPadding, width, barHeight);
+                    e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+
+                    // Draw process ID centered
+                    string pid = $"P{process[i].ID}";
+                    SizeF textSize = e.Graphics.MeasureString(pid, font);
+                    float textX = xOffset + (width - textSize.Width) / 2;
+                    float textY = topPadding + (barHeight - textSize.Height) / 2;
+                    e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+
+                    // Draw start time below the bar
+                    float startTime;
+                    if (i == 0)
+                    {
+                        startTime = process[i].arrival;
+                    }
+                    else
+                    {
+                        startTime = Math.Max(process[i].arrival, process[i - 1].CT);
+                    }
+                    e.Graphics.DrawString(startTime.ToString(), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+
+
+                    xOffset += width;
                 }
-                e.Graphics.DrawString(startTime.ToString(), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
 
-
-                xOffset += width;
+                string lastCT = process[process.Count - 1].CT.ToString();
+                SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+                e.Graphics.DrawString(lastCT, font, Brushes.Black, xOffset - lastCTSize.Width, topPadding + barHeight + 2);
             }
-
-            string lastCT = process[process.Count - 1].CT.ToString();
-            SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
-            e.Graphics.DrawString(lastCT, font, Brushes.Black, xOffset - lastCTSize.Width, topPadding + barHeight + 2);
 
         }
 
@@ -481,14 +485,15 @@ namespace OsProject
         {
             int n = process.Count;
             int completed = 0;
-            int currentTime = 0;
-            int[] rem = process.Select(p => p.burst).ToArray();
+            float currentTime = 0;
+            float[] rem = process.Select(p => p.burst).ToArray();
             bool[] isDone = new bool[n];
 
             while (completed != n)
             {
                 // Find process with highest priority that has arrived
-                int imin = -1, minPriority = int.MaxValue;
+                int imin = -1;
+                float minPriority = 9999;
                 for (int i = 0; i < n; i++)
                 {
                     if (!isDone[i] && process[i].arrival <= currentTime && rem[i] > 0 &&
@@ -517,11 +522,12 @@ namespace OsProject
                 else
                 {
                     // Jump to next arrival time instead of incrementing one by one
-                    int nextArrival = process.Where(p => !isDone[p.ID])
-                                             .Select(p => p.arrival)
-                                             .Where(t => t > currentTime)
-                                             .DefaultIfEmpty(currentTime + 1)
-                                             .Min();
+                    float nextArrival = process
+                          .Where(p => !isDone[(int)p.ID])
+                          .Select(p => p.arrival)
+                          .Where(t => t > currentTime)
+                          .DefaultIfEmpty(currentTime + 1)
+                          .Min();
                     currentTime = nextArrival;
                 }
             }
