@@ -478,7 +478,505 @@ namespace OsProject
                 SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
                 e.Graphics.DrawString(lastCT, font, Brushes.Black, xOffset - lastCTSize.Width, topPadding + barHeight + 2);
             }
+            if (flagc == 2) // SJF Preemptive
+            {
+                if (process.Count == 0)
+                    return;
 
+                int panelWidth = panelGanttChart.ClientSize.Width;
+                int panelHeight = panelGanttChart.ClientSize.Height;
+
+                // Styling
+                int xPadding = 10;
+                int topPadding = 10;
+                int labelHeight = 18;
+                int barHeight = panelHeight - topPadding - labelHeight - 8;
+
+                Font font = new Font("Arial", 10);
+                Brush[] barBrushes = { Brushes.Blue, Brushes.Green, Brushes.Red, Brushes.Purple, Brushes.Orange };
+                Brush textBrush = Brushes.White;
+                Pen borderPen = Pens.Black;
+
+                // Find maximum completion time
+                float maxCT = process.Max(p => p.CT);
+                if (maxCT == 0) return;
+
+                int availableWidth = panelWidth - 2 * xPadding;
+                float pixelsPerTime = (float)availableWidth / maxCT;
+
+                // Simulate timeline to capture all process segments
+                List<(int id, float start, float end)> segments = new List<(int, float, float)>();
+                float currentTime = 0;
+                int[] remTimes = process.Select(p => (int)p.burst).ToArray();
+                bool[] completed = new bool[process.Count];
+
+                while (true)
+                {
+                    // Find process with shortest remaining time
+                    int shortestIdx = -1;
+                    int shortestTime = int.MaxValue;
+                    for (int i = 0; i < process.Count; i++)
+                    {
+                        if (!completed[i] && process[i].arrival <= currentTime && remTimes[i] < shortestTime && remTimes[i] > 0)
+                        {
+                            shortestTime = remTimes[i];
+                            shortestIdx = i;
+                        }
+                    }
+
+                    if (shortestIdx == -1)
+                    {
+                        if (completed.All(c => c)) break;
+                        currentTime++;
+                        continue;
+                    }
+
+                    // Record this execution segment
+                    float segmentStart = currentTime;
+                    remTimes[shortestIdx]--;
+                    currentTime++;
+
+                    if (remTimes[shortestIdx] == 0)
+                    {
+                        completed[shortestIdx] = true;
+                    }
+
+                    segments.Add((shortestIdx, segmentStart, currentTime));
+                }
+
+                // Draw all segments
+                int xOffset = xPadding;
+                foreach (var segment in segments)
+                {
+                    int width = (int)Math.Round((segment.end - segment.start) * pixelsPerTime);
+                    if (width < 1) width = 1; // Ensure at least 1 pixel wide
+
+                    int colorIdx = segment.id % barBrushes.Length;
+                    e.Graphics.FillRectangle(barBrushes[colorIdx], xOffset, topPadding, width, barHeight);
+                    e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+
+                    // Only draw PID if segment is wide enough
+                    if (width > 20)
+                    {
+                        string pid = $"P{process[segment.id].ID}";
+                        SizeF textSize = e.Graphics.MeasureString(pid, font);
+                        float textX = xOffset + (width - textSize.Width) / 2;
+                        float textY = topPadding + (barHeight - textSize.Height) / 2;
+                        e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+                    }
+
+                    // Draw start time below first segment of each process
+                    if (segment.start == process[segment.id].arrival ||
+                        segments.Where(s => s.id == segment.id).Min(s => s.start) == segment.start)
+                    {
+                        e.Graphics.DrawString(segment.start.ToString("0"), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+                    }
+
+                    xOffset += width;
+                }
+
+                // Draw final completion time
+                string lastCT = maxCT.ToString("0");
+                SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+                e.Graphics.DrawString(lastCT, font, Brushes.Black, panelWidth - xPadding - lastCTSize.Width, topPadding + barHeight + 2);
+            }
+            else if (flagc == 3) // SJF Non-Preemptive
+            {
+                if (process == null || process.Count == 0)
+                    return;
+
+                // Panel dimensions and layout
+                int panelWidth = panelGanttChart.ClientSize.Width;
+                int panelHeight = panelGanttChart.ClientSize.Height;
+                const int xPadding = 10;
+                const int topPadding = 10;
+                const int labelHeight = 18;
+                int barHeight = panelHeight - topPadding - labelHeight - 8;
+
+                // Drawing resources
+                Font font = new Font("Arial", 10);
+                Brush barBrush = Brushes.Blue;
+                Brush textBrush = Brushes.White;
+                Pen borderPen = Pens.Black;
+
+                // Create ordered list by burst time (SJF)
+                var orderedProcesses = process.OrderBy(p => p.burst)
+                                             .ThenBy(p => p.arrival)
+                                             .ToList();
+
+                // Calculate total execution time
+                float totalTime = orderedProcesses.Sum(p => p.burst);
+                if (totalTime <= 0) return;
+
+                int availableWidth = panelWidth - 2 * xPadding;
+                float pixelsPerTime = (float)availableWidth / totalTime;
+
+                // Draw each process bar
+                int xOffset = xPadding;
+                float currentTime = 0;
+
+                foreach (var proc in orderedProcesses)
+                {
+                    float startTime = Math.Max(currentTime, proc.arrival);
+                    float endTime = startTime + proc.burst;
+                    int width = (int)Math.Round((endTime - startTime) * pixelsPerTime);
+
+                    // Ensure minimum width for visibility
+                    if (width < 1) width = 1;
+
+                    // Draw bar
+                    Rectangle barRect = new Rectangle(xOffset, topPadding, width, barHeight);
+                    e.Graphics.FillRectangle(barBrush, barRect);
+                    e.Graphics.DrawRectangle(borderPen, barRect);
+
+                    // Draw process ID (centered if space allows)
+                    string pid = $"P{proc.ID}";
+                    SizeF textSize = e.Graphics.MeasureString(pid, font);
+                    if (width > textSize.Width + 4)
+                    {
+                        float textX = xOffset + (width - textSize.Width) / 2;
+                        float textY = topPadding + (barHeight - textSize.Height) / 2;
+                        e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+                    }
+
+                    // Draw start time below bar
+                    e.Graphics.DrawString(startTime.ToString("0"), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+
+                    xOffset += width;
+                    currentTime = endTime;
+                }
+
+                // Draw final completion time
+                if (orderedProcesses.Count > 0)
+                {
+                    string lastCT = currentTime.ToString("0");
+                    SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+                    e.Graphics.DrawString(lastCT, font, Brushes.Black,
+                        panelWidth - xPadding - lastCTSize.Width, topPadding + barHeight + 2);
+                }
+
+                // Clean up resources
+                font.Dispose();
+            }
+            else if (flagc == 4) // Priority Preemptive
+            {
+                if (process == null || process.Count == 0)
+                    return;
+
+                // Panel dimensions and layout
+                int panelWidth = panelGanttChart.ClientSize.Width;
+                int panelHeight = panelGanttChart.ClientSize.Height;
+                const int xPadding = 10;
+                const int topPadding = 10;
+                const int labelHeight = 18;
+                int barHeight = panelHeight - topPadding - labelHeight - 8;
+
+                // Drawing resources
+                Font font = new Font("Arial", 10);
+                Brush[] barBrushes = { Brushes.Blue, Brushes.Green, Brushes.Red, Brushes.Purple, Brushes.Orange };
+                Brush textBrush = Brushes.White;
+                Pen borderPen = Pens.Black;
+
+                // Find maximum completion time
+                float maxCT = process.Max(p => p.CT);
+                if (maxCT <= 0) return;
+
+                int availableWidth = panelWidth - 2 * xPadding;
+                float pixelsPerTime = (float)availableWidth / maxCT;
+
+                // Simulate timeline to capture all execution segments
+                List<(int idx, float start, float end)> segments = new List<(int, float, float)>();
+                float currentTime = 0;
+                int[] remTimes = process.Select(p => (int)p.burst).ToArray();
+                bool[] completed = new bool[process.Count];
+
+                while (currentTime <= maxCT)
+                {
+                    // Find highest priority (lowest number) available process
+                    int highestPriorityIdx = -1;
+                    float highestPriority = float.MaxValue;
+                    for (int i = 0; i < process.Count; i++)
+                    {
+                        if (!completed[i] && process[i].arrival <= currentTime &&
+                            process[i].priority < highestPriority && remTimes[i] > 0)
+                        {
+                            highestPriority = process[i].priority;
+                            highestPriorityIdx = i;
+                        }
+                    }
+
+                    if (highestPriorityIdx == -1)
+                    {
+                        currentTime++;
+                        continue;
+                    }
+
+                    // Record this execution segment
+                    float segmentStart = currentTime;
+                    remTimes[highestPriorityIdx]--;
+                    currentTime++;
+
+                    if (remTimes[highestPriorityIdx] == 0)
+                    {
+                        completed[highestPriorityIdx] = true;
+                    }
+
+                    // Check if we should continue with same process
+                    bool shouldContinue = false;
+                    if (!completed[highestPriorityIdx])
+                    {
+                        // Check if still highest priority at new time
+                        float nextPriority = float.MaxValue;
+                        for (int i = 0; i < process.Count; i++)
+                        {
+                            if (!completed[i] && process[i].arrival <= currentTime &&
+                                process[i].priority < nextPriority && remTimes[i] > 0)
+                            {
+                                nextPriority = process[i].priority;
+                            }
+                        }
+                        shouldContinue = (highestPriority <= nextPriority);
+                    }
+
+                    if (!shouldContinue || remTimes[highestPriorityIdx] == 0)
+                    {
+                        segments.Add((highestPriorityIdx, segmentStart, currentTime));
+                    }
+                }
+
+                // Draw all segments
+                int xOffset = xPadding;
+                foreach (var segment in segments)
+                {
+                    int width = (int)Math.Round((segment.end - segment.start) * pixelsPerTime);
+                    if (width < 1) width = 1; // Ensure minimum visibility
+
+                    int colorIdx = segment.idx % barBrushes.Length;
+                    e.Graphics.FillRectangle(barBrushes[colorIdx], xOffset, topPadding, width, barHeight);
+                    e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+
+                    // Draw process ID if segment is wide enough
+                    if (width > 20)
+                    {
+                        string pid = $"P{process[segment.idx].ID}";
+                        SizeF textSize = e.Graphics.MeasureString(pid, font);
+                        float textX = xOffset + (width - textSize.Width) / 2;
+                        float textY = topPadding + (barHeight - textSize.Height) / 2;
+                        e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+                    }
+
+                    // Draw start time below first segment of each process
+                    if (segment.start == process[segment.idx].arrival ||
+                        !segments.Any(s => s.idx == segment.idx && s.start < segment.start))
+                    {
+                        e.Graphics.DrawString(segment.start.ToString("0"), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+                    }
+
+                    xOffset += width;
+                }
+
+                // Draw final completion time
+                string lastCT = maxCT.ToString("0");
+                SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+                e.Graphics.DrawString(lastCT, font, Brushes.Black,
+                    panelWidth - xPadding - lastCTSize.Width, topPadding + barHeight + 2);
+
+                // Clean up
+                font.Dispose();
+            }
+            else if (flagc == 5) // Priority Non-Preemptive
+            {
+                if (process == null || process.Count == 0)
+                    return;
+
+                // Panel dimensions and layout
+                int panelWidth = panelGanttChart.ClientSize.Width;
+                int panelHeight = panelGanttChart.ClientSize.Height;
+                const int xPadding = 10;
+                const int topPadding = 10;
+                const int labelHeight = 18;
+                int barHeight = panelHeight - topPadding - labelHeight - 8;
+
+                // Drawing resources
+                Font font = new Font("Arial", 10);
+                Brush[] barBrushes = { Brushes.Blue, Brushes.Green, Brushes.Red, Brushes.Purple, Brushes.Orange };
+                Brush textBrush = Brushes.White;
+                Pen borderPen = Pens.Black;
+
+                // Create ordered list by priority (lower number = higher priority)
+                var orderedProcesses = process.OrderBy(p => p.priority)
+                                            .ThenBy(p => p.arrival)
+                                            .ToList();
+
+                // Calculate start and end times
+                float currentTime = 0;
+                List<(int idx, float start, float end)> segments = new List<(int, float, float)>();
+
+                foreach (var proc in orderedProcesses)
+                {
+                    int idx = process.FindIndex(p => p.ID == proc.ID);
+                    float startTime = Math.Max(currentTime, proc.arrival);
+                    float endTime = startTime + proc.burst;
+                    segments.Add((idx, startTime, endTime));
+                    currentTime = endTime;
+                }
+
+                float totalTime = currentTime;
+                if (totalTime <= 0) return;
+
+                int availableWidth = panelWidth - 2 * xPadding;
+                float pixelsPerTime = (float)availableWidth / totalTime;
+
+                // Draw each process bar
+                int xOffset = xPadding;
+                foreach (var segment in segments)
+                {
+                    int width = (int)Math.Round((segment.end - segment.start) * pixelsPerTime);
+                    if (width < 1) width = 1;
+
+                    int colorIdx = segment.idx % barBrushes.Length;
+                    e.Graphics.FillRectangle(barBrushes[colorIdx], xOffset, topPadding, width, barHeight);
+                    e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+
+                    // Draw process ID (centered if space allows)
+                    string pid = $"P{process[segment.idx].ID}";
+                    SizeF textSize = e.Graphics.MeasureString(pid, font);
+                    if (width > textSize.Width + 4)
+                    {
+                        float textX = xOffset + (width - textSize.Width) / 2;
+                        float textY = topPadding + (barHeight - textSize.Height) / 2;
+                        e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+                    }
+
+                    // Draw start time below bar
+                    e.Graphics.DrawString(segment.start.ToString("0"), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+
+                    xOffset += width;
+                }
+
+                // Draw final completion time
+                string lastCT = totalTime.ToString("0");
+                SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+                e.Graphics.DrawString(lastCT, font, Brushes.Black,
+                    panelWidth - xPadding - lastCTSize.Width, topPadding + barHeight + 2);
+
+                // Clean up
+                font.Dispose();
+            }
+            else if (flagc == 6) // Round Robin
+            {
+                if (process == null || process.Count == 0 || process[0].QT <= 0)
+                    return;
+
+                // Panel dimensions and layout
+                int panelWidth = panelGanttChart.ClientSize.Width;
+                int panelHeight = panelGanttChart.ClientSize.Height;
+                const int xPadding = 10;
+                const int topPadding = 10;
+                const int labelHeight = 18;
+                int barHeight = panelHeight - topPadding - labelHeight - 8;
+
+                // Drawing resources
+                Font font = new Font("Arial", 10);
+                Brush[] barBrushes = { Brushes.Blue, Brushes.Green, Brushes.Red, Brushes.Purple, Brushes.Orange };
+                Brush textBrush = Brushes.White;
+                Pen borderPen = Pens.Black;
+
+                // Find maximum completion time
+                float maxCT = process.Max(p => p.CT);
+                if (maxCT <= 0) return;
+
+                int availableWidth = panelWidth - 2 * xPadding;
+                float pixelsPerTime = (float)availableWidth / maxCT;
+
+                // Simulate RR scheduling to get all execution segments
+                List<(int idx, float start, float end)> segments = new List<(int, float, float)>();
+                float currentTime = 0;
+                float quantum = process[0].QT;
+                int[] remTimes = process.Select(p => (int)p.burst).ToArray();
+                Queue<int> readyQueue = new Queue<int>();
+
+                // Initial queue population (processes that arrive at time 0)
+                var initialProcesses = process
+                    .Select((p, i) => new { Index = i, p.arrival })
+                    .Where(x => x.arrival <= currentTime)
+                    .OrderBy(x => x.arrival)
+                    .Select(x => x.Index);
+
+                foreach (int idx in initialProcesses)
+                {
+                    readyQueue.Enqueue(idx);
+                }
+
+                while (readyQueue.Count > 0)
+                {
+                    int currentIdx = readyQueue.Dequeue();
+                    float startTime = currentTime;
+                    float executionTime = Math.Min(quantum, remTimes[currentIdx]);
+                    float endTime = startTime + executionTime;
+
+                    // Add to segments list
+                    segments.Add((currentIdx, startTime, endTime));
+
+                    // Update remaining time
+                    remTimes[currentIdx] -= (int)executionTime;
+                    currentTime = endTime;
+
+                    // Add newly arrived processes to queue
+                    var newArrivals = process
+                        .Select((p, i) => new { Index = i, p.arrival })
+                        .Where(x => x.arrival > startTime && x.arrival <= endTime && !readyQueue.Contains(x.Index) && remTimes[x.Index] > 0)
+                        .OrderBy(x => x.arrival)
+                        .Select(x => x.Index);
+
+                    foreach (int idx in newArrivals)
+                    {
+                        readyQueue.Enqueue(idx);
+                    }
+
+                    // Re-add current process to queue if not finished
+                    if (remTimes[currentIdx] > 0)
+                    {
+                        readyQueue.Enqueue(currentIdx);
+                    }
+                }
+
+                // Draw all segments
+                int xOffset = xPadding;
+                foreach (var segment in segments)
+                {
+                    int width = (int)Math.Round((segment.end - segment.start) * pixelsPerTime);
+                    if (width < 1) width = 1; // Ensure minimum visibility
+
+                    int colorIdx = segment.idx % barBrushes.Length;
+                    e.Graphics.FillRectangle(barBrushes[colorIdx], xOffset, topPadding, width, barHeight);
+                    e.Graphics.DrawRectangle(borderPen, xOffset, topPadding, width, barHeight);
+
+                    // Draw process ID if segment is wide enough
+                    if (width > 20)
+                    {
+                        string pid = $"P{process[segment.idx].ID}";
+                        SizeF textSize = e.Graphics.MeasureString(pid, font);
+                        float textX = xOffset + (width - textSize.Width) / 2;
+                        float textY = topPadding + (barHeight - textSize.Height) / 2;
+                        e.Graphics.DrawString(pid, font, textBrush, textX, textY);
+                    }
+
+                    // Draw start time below first segment of each time slice
+                    e.Graphics.DrawString(segment.start.ToString("0"), font, Brushes.Black, xOffset, topPadding + barHeight + 2);
+
+                    xOffset += width;
+                }
+
+                // Draw final completion time
+                string lastCT = maxCT.ToString("0");
+                SizeF lastCTSize = e.Graphics.MeasureString(lastCT, font);
+                e.Graphics.DrawString(lastCT, font, Brushes.Black,
+                    panelWidth - xPadding - lastCTSize.Width, topPadding + barHeight + 2);
+
+                // Clean up
+                font.Dispose();
+            }
         }
 
         void CalcPP()
